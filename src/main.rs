@@ -12,6 +12,57 @@ struct Args {
     version: bool,
 }
 
+#[cfg(not(feature = "color"))]
+fn print_help() {
+    printdoc! {"
+        {crate_name} {crate_version}
+        {crate_authors}
+        {crate_description}
+
+        USAGE:
+            {crate_name} [NAME]
+
+        FLAGS:
+            -h,--help       Prints help information
+            -V,--version    Prints version information
+
+        ARGS:
+            <NAME>:         The crate name to check for",
+        crate_name = env!("CARGO_PKG_NAME"),
+        crate_version = env!("CARGO_PKG_VERSION"),
+        crate_authors = env!("CARGO_PKG_AUTHORS"),
+        crate_description = env!("CARGO_PKG_DESCRIPTION"),
+    };
+}
+
+#[cfg(feature = "color")]
+fn print_help() {
+    use colored::Colorize;
+
+    printdoc! {"
+        {crate_name} {crate_version}
+        {crate_authors}
+        {crate_description}
+
+        {usage}:
+            {crate_name} [NAME]
+
+        {flags}:
+            -h,--help       Prints help information
+            -V,--version    Prints version information
+
+        {args}:
+            <NAME>:         The crate name to check for",
+        crate_name = env!("CARGO_PKG_NAME"),
+        crate_version = env!("CARGO_PKG_VERSION"),
+        crate_authors = env!("CARGO_PKG_AUTHORS"),
+        crate_description = env!("CARGO_PKG_DESCRIPTION"),
+        usage = "USAGE".green(),
+        flags = "FLAGS".green(),
+        args = "ARGS".green(),
+    };
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = Arguments::from_env();
     println!("{:?}", &args);
@@ -24,25 +75,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if args.version {
         println!("cargo-free v{}", env!("CARGO_PKG_VERSION"));
     } else if args.help {
-        printdoc! {"
-            {crate_name} {crate_version}
-            {crate_authors}
-            {crate_description}
-
-            USAGE:
-                {crate_name} [NAME]
-
-            FLAGS:
-                -h,--help       Prints help information
-                -V,--version    Prints version information
-
-            ARGS:
-                <NAME>:         The crate name to check for",
-            crate_name = env!("CARGO_PKG_NAME"),
-            crate_version = env!("CARGO_PKG_VERSION"),
-            crate_authors = env!("CARGO_PKG_AUTHORS"),
-            crate_description = env!("CARGO_PKG_DESCRIPTION"),
-        };
+        print_help();
     } else {
         let availabilities = args
             .names
