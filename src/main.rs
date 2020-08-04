@@ -1,6 +1,7 @@
 use cargo_free::check_availability;
 use indoc::printdoc;
 use pico_args::Arguments;
+use colored::Colorize;
 
 /// The program's arguments.
 struct Args {
@@ -63,6 +64,17 @@ fn print_help() {
     };
 }
 
+#[cfg(not(feature = "colors"))]
+fn print_version() {
+    println!("cargo-free v{}", env!("CARGO_PKG_VERSION"));
+}
+
+#[cfg(feature = "colors")]
+fn print_version() {
+    use colored::Colorize;
+    println!("{} v{}", "cargo-free".green(), env!("CARGO_PKG_VERSION"));
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = Arguments::from_env();
     println!("{:?}", &args);
@@ -73,7 +85,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     if args.version {
-        println!("cargo-free v{}", env!("CARGO_PKG_VERSION"));
+        print_version();
     } else if args.help {
         print_help();
     } else {
