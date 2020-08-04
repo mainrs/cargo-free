@@ -12,7 +12,7 @@ struct Args {
     version: bool,
 }
 
-#[cfg(not(feature = "color"))]
+#[cfg(not(feature = "colors"))]
 fn print_help() {
     printdoc! {"
         {crate_name} {crate_version}
@@ -35,7 +35,7 @@ fn print_help() {
     };
 }
 
-#[cfg(feature = "color")]
+#[cfg(feature = "colors")]
 fn print_help() {
     use colored::Colorize;
 

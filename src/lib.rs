@@ -1,3 +1,4 @@
+#[cfg(feature = "colors")]
 use colored::Colorize;
 use std::{fmt, fmt::Formatter, time::Duration};
 
@@ -14,7 +15,7 @@ pub enum Availability {
 }
 
 impl fmt::Display for Availability {
-    #[cfg(not(feature = "color"))]
+    #[cfg(not(feature = "colors"))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Availability::Available => write!(f, "Available"),
@@ -23,7 +24,7 @@ impl fmt::Display for Availability {
         }
     }
 
-    #[cfg(feature = "color")]
+    #[cfg(feature = "colors")]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Availability::Available => write!(f, "Available".green()),
