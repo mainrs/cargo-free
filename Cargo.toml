@@ -1,0 +1,6 @@
+[package]
+name = "carg0-free"
+version = "0.0.0"
+license = "MIT OR Apache-2.0"
+authors = ["Sven Lechner <SirWindfield@users.noreply.github.com>"]
+edition = "2018"
