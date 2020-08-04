@@ -15,4 +15,4 @@ pico-args = { version = "0.3.3", default-features = false }
 ureq = { version = "1.3.0", default-features = false, features = ["tls"] }
 
 [features]
-color = ["colored"]
+colors = ["colored"]
