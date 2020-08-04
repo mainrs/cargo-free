@@ -35,6 +35,19 @@ impl fmt::Display for Availability {
     }
 }
 
+/// Checks the availability for a given crate name.
+///
+/// # Arguments
+///
+/// - `name`: The crate name to check
+///
+/// # Returns
+///
+/// `Ok(Availability)` if the name could be resolved, an error otherwise.
+///
+/// # Note
+///
+/// The needed network request will timeout after five seconds.
 pub fn check_availability(name: impl AsRef<str>) -> Result<Availability, ()> {
     let name = name.as_ref();
     if name.is_empty() {
