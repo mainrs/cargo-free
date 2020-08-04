@@ -44,13 +44,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             crate_description = env!("CARGO_PKG_DESCRIPTION"),
         };
     } else {
-        let availabilities = args.names.into_iter().map(|crate_name| check_availability(crate_name)).collect::<Vec<_>>();
+        let availabilities = args
+            .names
+            .into_iter()
+            .map(|crate_name| check_availability(crate_name))
+            .collect::<Vec<_>>();
         for availability in availabilities {
             match availability {
                 Ok(availability) => println!("{}", availability),
                 Err(_) => {
                     // TODO: handle as well. Maybe print name.
-                },
+                }
             }
         }
     }

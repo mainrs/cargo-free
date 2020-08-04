@@ -1,7 +1,5 @@
 use colored::Colorize;
-use std::fmt;
-use std::time::Duration;
-use std::fmt::Formatter;
+use std::{fmt, fmt::Formatter, time::Duration};
 
 const TIMEOUT: u64 = 5;
 
