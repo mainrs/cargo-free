@@ -66,13 +66,13 @@ fn print_help() {
 
 #[cfg(not(feature = "colors"))]
 fn print_version() {
-    println!("cargo-free v{}", env!("CARGO_PKG_VERSION"));
+    println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 }
 
 #[cfg(feature = "colors")]
 fn print_version() {
     use colored::Colorize;
-    println!("{} v{}", "cargo-free".green(), env!("CARGO_PKG_VERSION"));
+    println!("{} v{}", env!("CARGO_PKG_NAME").green(), env!("CARGO_PKG_VERSION"));
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
