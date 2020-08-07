@@ -76,7 +76,6 @@ fn print_version() {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = Arguments::from_env();
-    println!("{:?}", &args);
     let args = Args {
         help: args.contains(["-h", "--help"]),
         version: args.contains(["-V", "--version"]),
