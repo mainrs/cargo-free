@@ -1,6 +1,7 @@
 use cargo_free::check_availability;
 use indoc::printdoc;
 use pico_args::Arguments;
+use std::env::args_os;
 
 /// The program's arguments.
 struct Args {
@@ -71,11 +72,19 @@ fn print_version() {
 #[cfg(feature = "colors")]
 fn print_version() {
     use colored::Colorize;
-    println!("{} v{}", env!("CARGO_PKG_NAME").green(), env!("CARGO_PKG_VERSION"));
+    println!(
+        "{} v{}",
+        env!("CARGO_PKG_NAME").green(),
+        env!("CARGO_PKG_VERSION")
+    );
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut args = Arguments::from_env();
+    // Cargo subcommands need to skip the first two arguments as cargo passes the
+    // subcommand itself as an argument. The first arg is the binary name
+    // (`cargo-free`).
+    let args = args_os().skip(2).collect();
+    let mut args = Arguments::from_vec(args);
     let args = Args {
         help: args.contains(["-h", "--help"]),
         version: args.contains(["-V", "--version"]),
