@@ -18,18 +18,18 @@ impl fmt::Display for Availability {
     #[cfg(not(feature = "colors"))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Availability::Available => write!(f, "Available"),
-            Availability::Unavailable => write!(f, "Unavailable"),
-            Availability::Unknown => write!(f, "Unknown"),
+            Availability::Available => write!(f, "{}", "Available"),
+            Availability::Unavailable => write!(f, "{}", "Unavailable"),
+            Availability::Unknown => write!(f, "{}", "Unknown"),
         }
     }
 
     #[cfg(feature = "colors")]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Availability::Available => write!(f, "Available".green()),
-            Availability::Unavailable => write!(f, "Unavailable".red()),
-            Availability::Unknown => write!(f, "Unknown".bright_black()),
+            Availability::Available => write!(f, "{}", "Available".green()),
+            Availability::Unavailable => write!(f, "{}", "Unavailable".red()),
+            Availability::Unknown => write!(f, "{}", "Unknown".bright_black()),
         }
     }
 }

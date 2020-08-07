@@ -1,7 +1,6 @@
 use cargo_free::check_availability;
 use indoc::printdoc;
 use pico_args::Arguments;
-use colored::Colorize;
 
 /// The program's arguments.
 struct Args {
