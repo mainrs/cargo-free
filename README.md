@@ -12,6 +12,12 @@
 cargo install cargo-free --locked
 ```
 
+If you do not want a colored help message and colored output, you can install without the feature:
+
+```text
+cargo install cargo-free --locked --no-default-features
+```
+
 ## Usage
 
 ```text
