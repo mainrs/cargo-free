@@ -21,14 +21,14 @@ fn print_help() {
         {crate_description}
 
         USAGE:
-            {crate_name} [NAME]
+            {crate_name} [NAMES]
 
         FLAGS:
             -h,--help       Prints help information
             -V,--version    Prints version information
 
         ARGS:
-            <NAME>:         The crate name to check for",
+            <NAMES>:         The crate names to check for",
         crate_name = env!("CARGO_PKG_NAME"),
         crate_version = env!("CARGO_PKG_VERSION"),
         crate_authors = env!("CARGO_PKG_AUTHORS"),
@@ -46,14 +46,14 @@ fn print_help() {
         {crate_description}
 
         {usage}:
-            {crate_name} [NAME]
+            {crate_name} [NAMES]
 
         {flags}:
             -h,--help       Prints help information
             -V,--version    Prints version information
 
         {args}:
-            <NAME>:         The crate name to check for",
+            <NAMES>:         The crate names to check for",
         crate_name = env!("CARGO_PKG_NAME"),
         crate_version = env!("CARGO_PKG_VERSION"),
         crate_authors = env!("CARGO_PKG_AUTHORS"),
