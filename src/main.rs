@@ -96,10 +96,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     } else if args.help {
         print_help();
     } else {
+        let mut max_length_crate_name = 0;
         let availabilities = args
             .names
             .iter()
-            .map(|crate_name| (crate_name, check_availability(&crate_name)))
+            .map(|crate_name| {
+                let crate_name_length = crate_name.len();
+                if crate_name_length > max_length_crate_name {
+                    max_length_crate_name = crate_name_length;
+                }
+
+                (crate_name, check_availability(&crate_name))
+            })
             .collect::<Vec<_>>();
         if availabilities.is_empty() {
             eprintln!("No crate names supplied!");
@@ -108,11 +116,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Display the crate name if more than one name has been passed to the CLI.
         let should_display_crate_names = availabilities.len() > 1;
-        let max_length_crate_name = availabilities
-            .iter()
-            .map(|(crate_name, _)| crate_name.len())
-            .max()
-            .unwrap();
 
         for availability in availabilities {
             match availability {
