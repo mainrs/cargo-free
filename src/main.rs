@@ -2,6 +2,7 @@ use cargo_free::check_availability;
 use indoc::printdoc;
 use pico_args::Arguments;
 use std::env::args_os;
+use std::process::exit;
 
 /// The program's arguments.
 struct Args {
@@ -98,13 +99,37 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         let availabilities = args
             .names
-            .into_iter()
-            .map(|crate_name| check_availability(crate_name))
+            .iter()
+            .map(|crate_name| (crate_name, check_availability(&crate_name)))
             .collect::<Vec<_>>();
+        if availabilities.len() == 0 {
+            eprintln!("No crate names supplied!");
+            exit(1);
+        }
+
+        // Display the crate name if more than one name has been passed to the CLI.
+        let should_display_crate_names = availabilities.len() > 1;
+        let max_length_crate_name = availabilities
+            .iter()
+            .map(|(crate_name, _)| crate_name.len())
+            .max()
+            .unwrap();
+
         for availability in availabilities {
             match availability {
-                Ok(availability) => println!("{}", availability),
-                Err(_) => {
+                (crate_name, Ok(availability)) => {
+                    if should_display_crate_names {
+                        println!(
+                            "{:<width$}: {}",
+                            crate_name,
+                            availability,
+                            width = max_length_crate_name
+                        );
+                    } else {
+                        println!("{}", availability);
+                    }
+                }
+                (_, Err(_)) => {
                     // TODO: handle as well. Maybe print name.
                 }
             }
