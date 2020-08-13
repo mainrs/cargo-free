@@ -101,7 +101,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .iter()
             .map(|crate_name| (crate_name, check_availability(&crate_name)))
             .collect::<Vec<_>>();
-        if availabilities.len() == 0 {
+        if availabilities.is_empty() {
             eprintln!("No crate names supplied!");
             exit(1);
         }
