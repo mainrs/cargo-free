@@ -25,6 +25,13 @@ $ cargo free name-to-check
 Available
 ```
 
+```text
+$ cargo free name1 name2 name3
+name1: Available
+name2: Available
+name3: Unavailable
+```
+
 ## License
 
 Licensed under either of
