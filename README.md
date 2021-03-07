@@ -20,6 +20,8 @@ cargo install cargo-free --locked --no-default-features
 
 ## Usage
 
+### CLI
+
 ```text
 $ cargo free name-to-check
 Available
@@ -30,6 +32,15 @@ $ cargo free name1 name2 name3
 name1: Available
 name2: Available
 name3: Unavailable
+```
+
+### Library
+
+```rust
+use cargo_free::{check_availability, Availability};
+
+let availability = check_availability("serde");
+assert_eq!(availability, Availability::Unavailable);
 ```
 
 ## License
