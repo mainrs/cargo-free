@@ -1,8 +1,17 @@
 #[cfg(feature = "colors")]
 use colored::Colorize;
 use std::{fmt, fmt::Formatter, time::Duration};
+use thiserror::Error;
 
-const TIMEOUT: u64 = 5;
+const DEFAULT_TIMEOUT_SECONDS: u64 = 5;
+
+#[derive(Debug, Error, Eq, PartialEq)]
+pub enum Error {
+    #[error("crate name is empty")]
+    EmptyCrateName,
+    #[error("API request to crates.io timed out after {0:?}")]
+    NetworkTimeout(Duration),
+}
 
 /// The availability status of a crate name.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -43,33 +52,38 @@ impl fmt::Display for Availability {
 ///
 /// # Returns
 ///
-/// `Ok(Availability)` if the name could be resolved, an error otherwise.
+/// `Ok(Availability)` if the name could be resolved. If the crate name is
+/// empty, `Err(Error::EmptyCrateName)` gets returned. Returns
+/// `Err(Error::NetworkTimeout)` if a timeout occurred.
 ///
 /// # Note
 ///
 /// The needed network request will timeout after five seconds.
-pub fn check_availability(name: impl AsRef<str>) -> Result<Availability, ()> {
-    check_availability_with_timeout(name, Duration::from_secs(TIMEOUT))
+pub fn check_availability(name: impl AsRef<str>) -> Result<Availability, Error> {
+    check_availability_with_timeout(name, Duration::from_secs(DEFAULT_TIMEOUT_SECONDS))
 }
 
-/// Checks the availability for a given crate name. Stops after the given timeout duration and returns `Availability::Unknown`.
+/// Checks the availability for a given crate name. Stops after the given
+/// timeout duration and returns `Availability::Unknown`.
 ///
 /// # Arguments
 ///
 /// - `name`: The crate name to check
-/// - `timeout`: The timeout after which to stop trying to connect to the crates.io API.
+/// - `timeout`: The timeout after which to stop trying to connect to the
+///   crates.io API.
 ///
 /// # Returns
 ///
-/// `Ok(Availability)` if the name could be resolved, an error otherwise.
+/// `Ok(Availability)` if the name could be resolved. If the crate name is
+/// empty, `Err(Error::EmptyCrateName)` gets returned. Returns
+/// `Err(Error::NetworkTimeout)` if a timeout occurred.
 pub fn check_availability_with_timeout(
     name: impl AsRef<str>,
     timeout: Duration,
-) -> Result<Availability, ()> {
+) -> Result<Availability, Error> {
     let name = name.as_ref();
     if name.is_empty() {
-        eprintln!("Crate name can't be empty");
-        return Err(());
+        return Err(Error::EmptyCrateName);
     }
 
     let url = format!("https://crates.io/api/v1/crates/{}", name);
@@ -77,6 +91,7 @@ pub fn check_availability_with_timeout(
     let availability = match resp.status() {
         200 => Availability::Unavailable,
         404 => Availability::Available,
+        408 => return Err(Error::NetworkTimeout(timeout)),
         _ => Availability::Unknown,
     };
     Ok(availability)
