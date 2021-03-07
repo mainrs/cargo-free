@@ -48,6 +48,23 @@ impl fmt::Display for Availability {
 ///
 /// The needed network request will timeout after five seconds.
 pub fn check_availability(name: impl AsRef<str>) -> Result<Availability, ()> {
+    check_availability_with_timeout(name, Duration::from_secs(TIMEOUT))
+}
+
+/// Checks the availability for a given crate name. Stops after the given timeout duration and returns `Availability::Unknown`.
+///
+/// # Arguments
+///
+/// - `name`: The crate name to check
+/// - `timeout`: The timeout after which to stop trying to connect to the crates.io API.
+///
+/// # Returns
+///
+/// `Ok(Availability)` if the name could be resolved, an error otherwise.
+pub fn check_availability_with_timeout(
+    name: impl AsRef<str>,
+    timeout: Duration,
+) -> Result<Availability, ()> {
     let name = name.as_ref();
     if name.is_empty() {
         eprintln!("Crate name can't be empty");
@@ -55,7 +72,7 @@ pub fn check_availability(name: impl AsRef<str>) -> Result<Availability, ()> {
     }
 
     let url = format!("https://crates.io/api/v1/crates/{}", name);
-    let resp = ureq::get(&url).timeout(Duration::from_secs(TIMEOUT)).call();
+    let resp = ureq::get(&url).timeout(timeout).call();
     let availability = match resp.status() {
         200 => Availability::Unavailable,
         404 => Availability::Available,
