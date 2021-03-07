@@ -4,7 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# [HEAD](https://github.com/SirWindfield/cargo-free/compare/v0.1.1...HEAD) (2020-08-13)
+# [HEAD](https://github.com/SirWindfield/cargo-free/compare/v0.2.0...HEAD) (2021-03-07)
+
+# [v0.2.0](https://github.com/SirWindfield/cargo-free/compare/v0.1.2...v0.2.0) (2021-03-07)
+
+### Features
+
+- add default derives to Availability ([cccf725](https://github.com/SirWindfield/cargo-free/commit/cccf7250f422219555411b6514786c52b755c822))
+- add check_availibility_with_timeout method ([38ba106](https://github.com/SirWindfield/cargo-free/commit/38ba10688ce886bcaf22c10a2f4bf3ad1d042245))
+
+#### Breaking changes
+
+- Method signatures of `check_` functions now return a specialized error type.
+
+## [v0.1.2](https://github.com/SirWindfield/cargo-free/compare/v0.1.1...v0.1.2) (2020-08-13)
 
 ### Features
 
