@@ -5,6 +5,7 @@ use thiserror::Error;
 
 const DEFAULT_TIMEOUT_SECONDS: u64 = 5;
 
+/// The crate's error type.
 #[derive(Debug, Error, Eq, PartialEq)]
 pub enum Error {
     #[error("crate name is empty")]
