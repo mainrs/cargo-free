@@ -5,6 +5,7 @@ use std::{fmt, fmt::Formatter, time::Duration};
 const TIMEOUT: u64 = 5;
 
 /// The availability status of a crate name.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Availability {
     /// The crate name is available.
     Available,
