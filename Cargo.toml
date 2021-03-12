@@ -5,7 +5,7 @@ description = "A cargo subcommand to check if a given crate name is available."
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/SirWindfield/cargo-free"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2018"
 
 [dependencies]
