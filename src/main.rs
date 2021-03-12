@@ -125,8 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             handle.error();
             exit(1);
         }
-        handle.text("Fetched metadata from crates.io!");
-        handle.done();
+        handle.stop_and_clear();
 
         for (crate_name, available) in availabilities {
             if let Ok(available) = available {
