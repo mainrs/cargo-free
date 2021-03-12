@@ -1,7 +1,13 @@
-use cargo_free::check_availability;
+use ansi_colors_macro::ansi_string;
+use cargo_free::{check_availability, Availability};
 use indoc::printdoc;
 use pico_args::Arguments;
 use std::{env::args_os, process::exit};
+#[cfg(feature = "colors")]
+use terminal_log_symbols::colored::{ERROR_SYMBOL, SUCCESS_SYMBOL};
+#[cfg(not(feature = "colors"))]
+use terminal_log_symbols::{ERROR_SYMBOL, SUCCESS_SYMBOL};
+use terminal_spinners::{SpinnerBuilder, DOTS};
 
 /// The program's arguments.
 struct Args {
@@ -96,6 +102,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     } else if args.help {
         print_help();
     } else {
+        let handle = SpinnerBuilder::new()
+            .spinner(&DOTS)
+            .text("Fetching metadata from crates.io ...")
+            .start();
+
         let mut max_length_crate_name = 0;
         let availabilities = args
             .names
@@ -110,30 +121,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
             .collect::<Vec<_>>();
         if availabilities.is_empty() {
-            eprintln!("No crate names supplied!");
+            handle.text("No crate names supplied!");
+            handle.error();
             exit(1);
         }
+        handle.text("Fetched metadata from crates.io!");
+        handle.done();
 
-        // Display the crate name if more than one name has been passed to the CLI.
-        let should_display_crate_names = availabilities.len() > 1;
-
-        for availability in availabilities {
-            match availability {
-                (crate_name, Ok(availability)) => {
-                    if should_display_crate_names {
-                        println!(
-                            "{:<width$} {}",
-                            format!("{}", crate_name),
-                            availability,
-                            width = max_length_crate_name + 1
-                        );
-                    } else {
-                        println!("{}", availability);
-                    }
-                }
-                (_, Err(_)) => {
-                    // TODO: handle as well. Maybe print name.
-                }
+        for (crate_name, available) in availabilities {
+            if let Ok(available) = available {
+                let emoji = match available {
+                    Availability::Available => SUCCESS_SYMBOL.to_string(),
+                    Availability::Unavailable => ERROR_SYMBOL.to_string(),
+                    #[cfg(feature = "colors")]
+                    Availability::Unknown => ansi_string!("{gray ?}").to_string(),
+                    #[cfg(not(feature = "colors"))]
+                    Availability::Unknown => "?".to_string(),
+                };
+                println!("{} {}", emoji, crate_name);
             }
         }
     }
