@@ -45,7 +45,6 @@ checksum = "2e8c087f005730276d1096a652e92a8bacee2e2472bcc9715a74d2bec38b5820"
 name = "cargo-free"
 version = "0.4.0"
 dependencies = [
- "ansi-colors-macro",
  "colored",
  "indoc",
  "pico-args",
@@ -470,9 +469,9 @@ dependencies = [
 
 [[package]]
 name = "terminal-log-symbols"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8997cfd7b49dbfaf52bb33fa94c9cf84f8ce69287de12c48308009591871ae8d"
+checksum = "6216f978d439a5ead3c04cf5d114c9bc31f1e8ba99f2549e2c2a5ae9fbee046b"
 dependencies = [
  "ansi-colors-macro",
  "terminal-emoji",

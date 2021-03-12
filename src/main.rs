@@ -1,12 +1,11 @@
-use ansi_colors_macro::ansi_string;
 use cargo_free::{check_availability, Availability};
 use indoc::printdoc;
 use pico_args::Arguments;
 use std::{env::args_os, process::exit};
 #[cfg(feature = "colors")]
-use terminal_log_symbols::colored::{ERROR_SYMBOL, SUCCESS_SYMBOL};
+use terminal_log_symbols::colored::{ERROR_SYMBOL, SUCCESS_SYMBOL, UNKNOWN_SYMBOL};
 #[cfg(not(feature = "colors"))]
-use terminal_log_symbols::{ERROR_SYMBOL, SUCCESS_SYMBOL};
+use terminal_log_symbols::{ERROR_SYMBOL, SUCCESS_SYMBOL, UNKNOWN_SYMBOL};
 use terminal_spinners::{SpinnerBuilder, DOTS};
 
 /// The program's arguments.
@@ -130,12 +129,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         for (crate_name, available) in availabilities {
             if let Ok(available) = available {
                 let emoji = match available {
-                    Availability::Available => SUCCESS_SYMBOL.to_string(),
-                    Availability::Unavailable => ERROR_SYMBOL.to_string(),
-                    #[cfg(feature = "colors")]
-                    Availability::Unknown => ansi_string!("{gray ?}").to_string(),
-                    #[cfg(not(feature = "colors"))]
-                    Availability::Unknown => "?".to_string(),
+                    Availability::Available => SUCCESS_SYMBOL,
+                    Availability::Unavailable => ERROR_SYMBOL,
+                    Availability::Unknown => UNKNOWN_SYMBOL,
                 };
                 println!("{} {}", emoji, crate_name);
             }
