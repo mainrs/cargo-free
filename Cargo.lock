@@ -479,9 +479,9 @@ dependencies = [
 
 [[package]]
 name = "terminal-spinners"
-version = "0.1.2"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "631123b2e97ae99f40752b046dd68a4544a2057c63e1310208bd591ca7f2b95b"
+checksum = "6bbcefe1f89432354eb8ad219e8431218125d6648260e48af01ba669314b8906"
 dependencies = [
  "anyhow",
  "crossterm",
