@@ -122,10 +122,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 (crate_name, Ok(availability)) => {
                     if should_display_crate_names {
                         println!(
-                            "{:<width$}: {}",
-                            crate_name,
+                            "{:<width$} {}",
+                            format!("{}", crate_name),
                             availability,
-                            width = max_length_crate_name
+                            width = max_length_crate_name + 1
                         );
                     } else {
                         println!("{}", availability);
