@@ -478,18 +478,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "terminal-spinners"
-version = "0.1.3"
+name = "terminal-spinner-data"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6bbcefe1f89432354eb8ad219e8431218125d6648260e48af01ba669314b8906"
+checksum = "3aadcf9cbc909865c51ff9ced167a1065201b9b35d7254d530c9520b687ef3f4"
 dependencies = [
  "anyhow",
- "crossterm",
  "heck",
  "quote",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "terminal-spinners"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2ac08de4c03c6fa84dada8333437f9417eca26869737c92a506b945b05f3006"
+dependencies = [
+ "crossterm",
  "terminal-log-symbols",
+ "terminal-spinner-data",
 ]
 
 [[package]]
