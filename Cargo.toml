@@ -11,7 +11,7 @@ edition = "2018"
 [dependencies]
 colored = { version = "2.0.0", optional = true }
 indoc = "1.0.3"
-pico-args = { version = "0.3.4", default-features = false }
+pico-args = { version = "0.4.0", default-features = false }
 terminal-log-symbols = "0.1.6"
 terminal-spinners = "0.3.1"
 thiserror = "1.0.24"
