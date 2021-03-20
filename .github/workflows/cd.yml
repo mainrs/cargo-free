@@ -27,10 +27,10 @@ jobs:
           profile: minimal
 
       - name: Run build
-          uses: actions-rs/cargo@v1
-          with:
-            command: build
-            args: --release
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
 
       - name: Publish to crates.io
         uses: actions-rs/cargo@v1
