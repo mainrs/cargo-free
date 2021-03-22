@@ -49,7 +49,7 @@ checksum = "63396b8a4b9de3f4fdfb320ab6080762242f66a8ef174c49d8e19b674db4cdbe"
 
 [[package]]
 name = "cargo-free"
-version = "0.5.1"
+version = "0.6.0"
 dependencies = [
  "clap",
  "serde_json",
