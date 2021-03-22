@@ -1,142 +1,114 @@
-use cargo_free::{check_availability, Availability};
-use indoc::printdoc;
-use pico_args::Arguments;
-use std::{env::args_os, process::exit};
-#[cfg(feature = "colors")]
+use cargo_free::{check_availability, Availability, Error};
+use clap::{AppSettings, Clap};
+use serde_json::json;
+use std::process::exit;
 use terminal_log_symbols::colored::{ERROR_SYMBOL, SUCCESS_SYMBOL, UNKNOWN_SYMBOL};
-#[cfg(not(feature = "colors"))]
-use terminal_log_symbols::{ERROR_SYMBOL, SUCCESS_SYMBOL, UNKNOWN_SYMBOL};
 use terminal_spinners::{SpinnerBuilder, DOTS};
 
-/// The program's arguments.
-struct Args {
-    /// True if the help screen should be displayed.
-    help: bool,
+/// XXX: There is no first-class support for cargo subcommands. This is
+/// basically the "official" workaround.
+#[derive(Clap, Debug)]
+#[clap(
+    author,
+    bin_name("cargo-free"),
+    setting(AppSettings::ColoredHelp),
+    version
+)]
+enum Cli {
+    #[clap(
+        name = "free",
+        setting(AppSettings::DeriveDisplayOrder),
+        setting(AppSettings::UnifiedHelpMessage)
+    )]
+    Free(FreeArgs),
+}
+
+#[derive(Clap, Debug)]
+struct FreeArgs {
+    /// Output result as json object.
+    #[clap(long, short)]
+    json: bool,
+
     /// The crate name to check for availability.
     names: Vec<String>,
-    /// True if the tool's version should be displayed.
-    version: bool,
-}
-
-#[cfg(not(feature = "colors"))]
-fn print_help() {
-    printdoc! {"
-        {crate_name} {crate_version}
-        {crate_authors}
-        {crate_description}
-
-        USAGE:
-            {crate_name} [NAMES]
-
-        FLAGS:
-            -h,--help       Prints help information
-            -V,--version    Prints version information
-
-        ARGS:
-            <NAMES>:         The crate names to check for",
-        crate_name = env!("CARGO_PKG_NAME"),
-        crate_version = env!("CARGO_PKG_VERSION"),
-        crate_authors = env!("CARGO_PKG_AUTHORS"),
-        crate_description = env!("CARGO_PKG_DESCRIPTION"),
-    };
-}
-
-#[cfg(feature = "colors")]
-fn print_help() {
-    use colored::Colorize;
-
-    printdoc! {"
-        {crate_name} {crate_version}
-        {crate_authors}
-        {crate_description}
-
-        {usage}:
-            {crate_name} [NAMES]
-
-        {flags}:
-            -h,--help       Prints help information
-            -V,--version    Prints version information
-
-        {args}:
-            <NAMES>:         The crate names to check for",
-        crate_name = env!("CARGO_PKG_NAME"),
-        crate_version = env!("CARGO_PKG_VERSION"),
-        crate_authors = env!("CARGO_PKG_AUTHORS"),
-        crate_description = env!("CARGO_PKG_DESCRIPTION"),
-        usage = "USAGE".green(),
-        flags = "FLAGS".green(),
-        args = "ARGS".green(),
-    };
-}
-
-#[cfg(not(feature = "colors"))]
-fn print_version() {
-    println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-}
-
-#[cfg(feature = "colors")]
-fn print_version() {
-    use colored::Colorize;
-    println!(
-        "{} v{}",
-        env!("CARGO_PKG_NAME").green(),
-        env!("CARGO_PKG_VERSION")
-    );
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Cargo subcommands need to skip the first two arguments as cargo passes the
-    // subcommand itself as an argument. The first arg is the binary name
-    // (`cargo-free`).
-    let args = args_os().skip(2).collect();
-    let mut args = Arguments::from_vec(args);
-    let args = Args {
-        help: args.contains(["-h", "--help"]),
-        version: args.contains(["-V", "--version"]),
-        names: args.free()?,
-    };
+    let cli = Cli::parse();
+    match cli {
+        Cli::Free(args) => {
+            // The spinner should only be shown if the user does not want json, as the
+            // spinner will interfere with piping otherwise.
+            let mut handle = None;
+            if !args.json {
+                handle = Some(
+                    SpinnerBuilder::new()
+                        .spinner(&DOTS)
+                        .text("Fetching metadata from crates.io ...")
+                        .start(),
+                );
+            }
 
-    if args.version {
-        print_version();
-    } else if args.help {
-        print_help();
-    } else {
-        let handle = SpinnerBuilder::new()
-            .spinner(&DOTS)
-            .text("Fetching metadata from crates.io ...")
-            .start();
+            // Calculate the maximum character length of all crate names supplied alongside
+            // their availability.
+            let mut max_length_crate_name = 0;
+            let availabilities = args
+                .names
+                .iter()
+                .map(|crate_name| {
+                    let crate_name_length = crate_name.len();
+                    if crate_name_length > max_length_crate_name {
+                        max_length_crate_name = crate_name_length;
+                    }
 
-        let mut max_length_crate_name = 0;
-        let availabilities = args
-            .names
-            .iter()
-            .map(|crate_name| {
-                let crate_name_length = crate_name.len();
-                if crate_name_length > max_length_crate_name {
-                    max_length_crate_name = crate_name_length;
+                    (crate_name, check_availability(&crate_name))
+                })
+                .collect::<Vec<_>>();
+            // Check if the list is empty (user did not supply any crate names).
+            if availabilities.is_empty() {
+                if let Some(handle) = handle {
+                    handle.text("No crate names supplied!");
+                    handle.error();
+                } else {
+                    eprintln!("No crate names supplied!");
+                }
+                exit(1);
+            }
+
+            if let Some(handle) = handle {
+                handle.stop_and_clear();
+            }
+
+            if args.json {
+                let mut objects = Vec::with_capacity(availabilities.len());
+                for (crate_name, available) in availabilities {
+                    if let Ok(available) = available {
+                        objects.push(json!({
+                            "crate": crate_name,
+                            "availability": available.to_string(),
+                        }));
+                    }
                 }
 
-                (crate_name, check_availability(&crate_name))
-            })
-            .collect::<Vec<_>>();
-        if availabilities.is_empty() {
-            handle.text("No crate names supplied!");
-            handle.error();
-            exit(1);
-        }
-        handle.stop_and_clear();
-
-        for (crate_name, available) in availabilities {
-            if let Ok(available) = available {
-                let emoji = match available {
-                    Availability::Available => SUCCESS_SYMBOL,
-                    Availability::Unavailable => ERROR_SYMBOL,
-                    Availability::Unknown => UNKNOWN_SYMBOL,
-                };
-                println!("{} {}", emoji, crate_name);
+                println!("{}", json!(objects));
+            } else {
+                print(availabilities);
             }
         }
     }
 
     Ok(())
+}
+
+fn print(availabilities: Vec<(&String, Result<Availability, Error>)>) {
+    for (crate_name, available) in availabilities {
+        if let Ok(available) = available {
+            let emoji = match available {
+                Availability::Available => SUCCESS_SYMBOL,
+                Availability::Unavailable => ERROR_SYMBOL,
+                Availability::Unknown => UNKNOWN_SYMBOL,
+            };
+            println!("{} {}", emoji, crate_name);
+        }
+    }
 }
