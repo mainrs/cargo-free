@@ -1,5 +1,3 @@
-#[cfg(feature = "colors")]
-use colored::Colorize;
 use std::{fmt, fmt::Formatter, time::Duration};
 use thiserror::Error;
 
@@ -10,6 +8,7 @@ const DEFAULT_TIMEOUT_SECONDS: u64 = 5;
 pub enum Error {
     #[error("crate name is empty")]
     EmptyCrateName,
+
     #[error("API request to crates.io timed out after {0:?}")]
     NetworkTimeout(Duration),
 }
@@ -19,28 +18,20 @@ pub enum Error {
 pub enum Availability {
     /// The crate name is available.
     Available,
+
     /// The crate name is unavailable.
     Unavailable,
+
     /// The crate name can't be resolved.
     Unknown,
 }
 
 impl fmt::Display for Availability {
-    #[cfg(not(feature = "colors"))]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Availability::Available => write!(f, "Available"),
-            Availability::Unavailable => write!(f, "Unavailable"),
-            Availability::Unknown => write!(f, "Unknown"),
-        }
-    }
-
-    #[cfg(feature = "colors")]
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            Availability::Available => write!(f, "{}", "Available".green()),
-            Availability::Unavailable => write!(f, "{}", "Unavailable".red()),
-            Availability::Unknown => write!(f, "{}", "Unknown".bright_black()),
+            Availability::Available => write!(f, "available"),
+            Availability::Unavailable => write!(f, "unavailable"),
+            Availability::Unknown => write!(f, "unknown"),
         }
     }
 }
