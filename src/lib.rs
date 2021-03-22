@@ -6,7 +6,7 @@ const DEFAULT_TIMEOUT_SECONDS: u64 = 5;
 /// The crate's error type.
 #[derive(Debug, Error, Eq, PartialEq)]
 pub enum Error {
-    #[error("crate name is empty")]
+    #[error("Crate name is empty")]
     EmptyCrateName,
 
     #[error("API request to crates.io timed out after {0:?}")]
@@ -79,12 +79,22 @@ pub fn check_availability_with_timeout(
     }
 
     let url = format!("https://crates.io/api/v1/crates/{}", name);
-    let resp = ureq::get(&url).timeout(timeout).call();
-    let availability = match resp.status() {
-        200 => Availability::Unavailable,
-        404 => Availability::Available,
-        408 => return Err(Error::NetworkTimeout(timeout)),
-        _ => Availability::Unknown,
+    let agent = ureq::builder().timeout(timeout).build();
+    let resp = agent.get(&url).call();
+    let availability = match resp {
+        Ok(resp) => match resp.status() {
+            200 => Availability::Unavailable,
+            _ => Availability::Unknown,
+        },
+        Err(e) => match e {
+            ureq::Error::Status(code, _) => match code {
+                404 => Availability::Available,
+                408 => return Err(Error::NetworkTimeout(timeout)),
+                _ => Availability::Unknown,
+            },
+            _ => Availability::Unknown,
+        },
     };
+
     Ok(availability)
 }
