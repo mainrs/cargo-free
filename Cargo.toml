@@ -13,7 +13,7 @@ clap = "3.0.0-beta.2"
 serde_json = { version = "1.0.64", optional = true }
 terminal-log-symbols = "0.1.6"
 terminal-spinners = "0.3.1"
-thiserror = "1.0.24"
+thiserror = "1.0.25"
 ureq = { version = "1.5.4", default-features = false, features = ["tls"] }
 
 [features]
