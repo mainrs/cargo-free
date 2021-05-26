@@ -1,0 +1,18 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: pico-args
+    versions:
+    - 0.4.0
+  - dependency-name: terminal-spinners
+    versions:
+    - 0.3.0
+  - dependency-name: ureq
+    versions:
+    - 2.0.1
