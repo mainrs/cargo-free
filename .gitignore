@@ -1,4 +1,6 @@
 # Ignore compilation units.
+/.direnv
+/result-bin
 /target
 
 # Ignore backup files.
